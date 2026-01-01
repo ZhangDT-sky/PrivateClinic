@@ -11,7 +11,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -71,7 +70,7 @@ class MedicalCaseControllerTest {
      */
     @Test
     void testGetMedicalCaseByPatientId() throws Exception {
-        List<MedicalCase> cases = Arrays.asList(testMedicalCase);
+        List<MedicalCase> cases = List.of(testMedicalCase);
         when(medicalCaseService.getMedicalCaseByPatientId(1L)).thenReturn(cases);
 
 
