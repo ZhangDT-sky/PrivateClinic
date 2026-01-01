@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.code.privateclinic.mapper.DrugMapper">
+    
+    <!-- 查询所有药品列表 -->
+    <select id="getDrugList" resultType="org.code.privateclinic.bean.Drug">
+        SELECT
+            drug_id AS drugId,
+            drug_name AS drugName,
+            specification,
+            price,
+            stock,
+            status,
+            create_time AS createTime,
+            update_time AS updateTime
+        FROM drug
+        WHERE status = 1
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 根据ID查询药品 -->
+    <select id="getDrugById" resultType="org.code.privateclinic.bean.Drug">
+        SELECT
+            drug_id AS drugId,
+            drug_name AS drugName,
+            specification,
+            price,
+            stock,
+            status,
+            create_time AS createTime,
+            update_time AS updateTime
+        FROM drug
+        WHERE drug_id = #{drugId}
+    </select>
+
+    <!-- 根据药品名称查询药品 -->
+    <select id="getDrugByName" resultType="org.code.privateclinic.bean.Drug">
+        SELECT
+            drug_id AS drugId,
+            drug_name AS drugName,
+            specification,
+            price,
+            stock,
+            status,
+            create_time AS createTime,
+            update_time AS updateTime
+        FROM drug
+        WHERE drug_name = #{drugName}
+        AND status = 1
+    </select>
+
+    <!-- 插入药品 -->
+    <insert id="addDrug" parameterType="org.code.privateclinic.bean.Drug" useGeneratedKeys="true" keyProperty="drugId">
+        INSERT INTO drug (
+            drug_name,
+            specification,
+            price,
+            stock,
+            status
+        ) VALUES (
+            #{drugName},
+            #{specification},
+            #{price},
+            #{stock},
+            #{status}
+        )
+    </insert>
+
+    <!-- 更新药品信息 -->
+    <update id="updateDrug" parameterType="org.code.privateclinic.bean.Drug">
+        UPDATE drug
+        <set>
+            <if test="drugName != null and drugName != ''">
+                drug_name = #{drugName},
+            </if>
+            <if test="specification != null and specification != ''">
+                specification = #{specification},
+            </if>
+            <if test="price != null">
+                price = #{price},
+            </if>
+            <if test="stock != null">
+                stock = #{stock},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+        </set>
+        WHERE drug_id = #{drugId}
+    </update>
+
+    <!-- 逻辑删除药品（更新状态为0） -->
+    <update id="deleteDrug">
+        UPDATE drug
+        SET status = 0
+        WHERE drug_id = #{drugId}
+    </update>
+
+    <!-- 物理删除药品 -->
+    <delete id="deleteDrugPhysical">
+        DELETE FROM drug
+        WHERE drug_id = #{drugId}
+    </delete>
+
+    <!-- 更新药品库存 -->
+    <update id="updateStock">
+        UPDATE drug
+        SET stock = #{stock}
+        WHERE drug_id = #{drugId}
+    </update>
+
+</mapper>

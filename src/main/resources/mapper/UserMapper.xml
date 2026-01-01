@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.code.privateclinic.mapper.UserMapper">
+    
+    <!-- 查询所有用户列表 -->
+    <select id="selectUser" resultType="org.code.privateclinic.bean.User">
+        SELECT
+            user_id AS userId,
+            username,
+            password,
+            user_name AS userName,
+            role,
+            phone,
+            status,
+            create_time AS createTime,
+            update_time AS updateTime
+        FROM user
+        WHERE status = 1
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 根据ID查询用户 -->
+    <select id="selectUserById" resultType="org.code.privateclinic.bean.User">
+        SELECT
+            user_id AS userId,
+            username,
+            password,
+            user_name AS userName,
+            role,
+            phone,
+            status,
+            create_time AS createTime,
+            update_time AS updateTime
+        FROM user
+        WHERE user_id = #{id}
+    </select>
+
+    <!-- 根据用户名查询用户 -->
+    <select id="selectUserByUsername" resultType="org.code.privateclinic.bean.User">
+        SELECT
+            user_id AS userId,
+            username,
+            password,
+            user_name AS userName,
+            role,
+            phone,
+            status,
+            create_time AS createTime,
+            update_time AS updateTime
+        FROM user
+        WHERE username = #{username}
+    </select>
+
+    <!-- 根据角色查询用户列表 -->
+    <select id="selectUserByRole" resultType="org.code.privateclinic.bean.User">
+        SELECT
+            user_id AS userId,
+            username,
+            password,
+            user_name AS userName,
+            role,
+            phone,
+            status,
+            create_time AS createTime,
+            update_time AS updateTime
+        FROM user
+        WHERE role = #{role} AND status = 1
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 插入用户 -->
+    <insert id="insertUser" parameterType="org.code.privateclinic.bean.User" useGeneratedKeys="true" keyProperty="userId">
+        INSERT INTO user (
+            username,
+            password,
+            user_name,
+            role,
+            phone,
+            status
+        ) VALUES (
+            #{username},
+            #{password},
+            #{userName},
+            #{role},
+            #{phone},
+            #{status}
+        )
+    </insert>
+
+    <!-- 更新用户信息 -->
+    <update id="updateUser" parameterType="org.code.privateclinic.bean.User">
+        UPDATE user
+        <set>
+            <if test="username != null and username != ''">
+                username = #{username},
+            </if>
+            <if test="password != null and password != ''">
+                password = #{password},
+            </if>
+            <if test="userName != null and userName != ''">
+                user_name = #{userName},
+            </if>
+            <if test="role != null and role != ''">
+                role = #{role},
+            </if>
+            <if test="phone != null and phone != ''">
+                phone = #{phone},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+        </set>
+        WHERE user_id = #{userId}
+    </update>
+
+    <!-- 逻辑删除用户（更新状态为0） -->
+    <update id="deleteUserById">
+        UPDATE user
+        SET status = 0
+        WHERE user_id = #{id}
+    </update>
+
+    <!-- 物理删除用户 -->
+    <delete id="deleteUserByIdPhysical">
+        DELETE FROM user
+        WHERE user_id = #{id}
+    </delete>
+
+</mapper>
