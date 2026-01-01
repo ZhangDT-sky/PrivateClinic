@@ -3,6 +3,7 @@ package org.code.privateclinic.bean;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,6 +22,7 @@ public class Patient {
     private String patientName;
 
     @Size(max = 10, message = "性别长度不能超过10个字符")
+    @Pattern(regexp = "^(男|女)$", message = "性别必须是 男 或 女")
     private String gender;
 
     private Integer age;
