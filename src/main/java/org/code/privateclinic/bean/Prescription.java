@@ -21,6 +21,7 @@ public class Prescription {
     @NotNull(message = "医生ID不能为空")
     private Long doctorId;
 
+    //金额
     private BigDecimal totalAmount;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")

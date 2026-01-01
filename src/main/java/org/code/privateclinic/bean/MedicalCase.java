@@ -23,15 +23,16 @@ public class MedicalCase {
     @NotNull(message = "医生ID不能为空")
     private Long doctorId;
 
+    // 症状
     private String symptom;
-
+    //诊断
     private String diagnosis;
 
     @NotBlank(message = "病例状态不能为空")
     @Size(max = 20, message = "病例状态长度不能超过20个字符")
     @Pattern(regexp = "^(NEW|TREATING|PRESCRIBED|FINISHED)$", message = "病例状态必须是 NEW、TREATING、PRESCRIBED 或 FINISHED")
     private String caseStatus;
-
+    //就诊时间
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime visitTime;
 
