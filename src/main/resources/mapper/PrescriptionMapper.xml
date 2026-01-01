@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.code.privateclinic.mapper.PrescriptionMapper">
+    
+    <!-- 查询所有处方列表 -->
+    <select id="getPrescriptionList" resultType="org.code.privateclinic.bean.Prescription">
+        SELECT
+            prescription_id AS prescriptionId,
+            case_id AS caseId,
+            doctor_id AS doctorId,
+            total_amount AS totalAmount,
+            create_time AS createTime
+        FROM prescription
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 根据ID查询处方 -->
+    <select id="getPrescriptionById" resultType="org.code.privateclinic.bean.Prescription">
+        SELECT
+            prescription_id AS prescriptionId,
+            case_id AS caseId,
+            doctor_id AS doctorId,
+            total_amount AS totalAmount,
+            create_time AS createTime
+        FROM prescription
+        WHERE prescription_id = #{prescriptionId}
+    </select>
+
+    <!-- 根据病例ID查询处方列表 -->
+    <select id="getPrescriptionByCaseId" resultType="org.code.privateclinic.bean.Prescription">
+        SELECT
+            prescription_id AS prescriptionId,
+            case_id AS caseId,
+            doctor_id AS doctorId,
+            total_amount AS totalAmount,
+            create_time AS createTime
+        FROM prescription
+        WHERE case_id = #{caseId}
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 根据医生ID查询处方列表 -->
+    <select id="getPrescriptionByDoctorId" resultType="org.code.privateclinic.bean.Prescription">
+        SELECT
+            prescription_id AS prescriptionId,
+            case_id AS caseId,
+            doctor_id AS doctorId,
+            total_amount AS totalAmount,
+            create_time AS createTime
+        FROM prescription
+        WHERE doctor_id = #{doctorId}
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 插入处方 -->
+    <insert id="addPrescription" parameterType="org.code.privateclinic.bean.Prescription" useGeneratedKeys="true" keyProperty="prescriptionId">
+        INSERT INTO prescription (
+            case_id,
+            doctor_id,
+            total_amount
+        ) VALUES (
+            #{caseId},
+            #{doctorId},
+            #{totalAmount}
+        )
+    </insert>
+
+    <!-- 更新处方信息 -->
+    <update id="updatePrescription" parameterType="org.code.privateclinic.bean.Prescription">
+        UPDATE prescription
+        <set>
+            <if test="caseId != null">
+                case_id = #{caseId},
+            </if>
+            <if test="doctorId != null">
+                doctor_id = #{doctorId},
+            </if>
+            <if test="totalAmount != null">
+                total_amount = #{totalAmount},
+            </if>
+        </set>
+        WHERE prescription_id = #{prescriptionId}
+    </update>
+
+    <!-- 删除处方 -->
+    <delete id="deletePrescription">
+        DELETE FROM prescription
+        WHERE prescription_id = #{prescriptionId}
+    </delete>
+
+</mapper>
+
