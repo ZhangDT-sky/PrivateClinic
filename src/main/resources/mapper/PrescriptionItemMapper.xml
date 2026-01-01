@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.code.privateclinic.mapper.PrescriptionItemMapper">
+    
+    <!-- 查询所有处方明细列表 -->
+    <select id="getPrescriptionItemList" resultType="org.code.privateclinic.bean.PrescriptionItem">
+        SELECT
+            item_id AS itemId,
+            prescription_id AS prescriptionId,
+            drug_id AS drugId,
+            quantity,
+            usage_method AS usageMethod,
+            price
+        FROM prescription_item
+        ORDER BY item_id DESC
+    </select>
+
+    <!-- 根据ID查询处方明细 -->
+    <select id="getPrescriptionItemById" resultType="org.code.privateclinic.bean.PrescriptionItem">
+        SELECT
+            item_id AS itemId,
+            prescription_id AS prescriptionId,
+            drug_id AS drugId,
+            quantity,
+            usage_method AS usageMethod,
+            price
+        FROM prescription_item
+        WHERE item_id = #{itemId}
+    </select>
+
+    <!-- 根据处方ID查询处方明细列表 -->
+    <select id="getPrescriptionItemByPrescriptionId" resultType="org.code.privateclinic.bean.PrescriptionItem">
+        SELECT
+            item_id AS itemId,
+            prescription_id AS prescriptionId,
+            drug_id AS drugId,
+            quantity,
+            usage_method AS usageMethod,
+            price
+        FROM prescription_item
+        WHERE prescription_id = #{prescriptionId}
+        ORDER BY item_id DESC
+    </select>
+
+    <!-- 插入处方明细 -->
+    <insert id="addPrescriptionItem" parameterType="org.code.privateclinic.bean.PrescriptionItem" useGeneratedKeys="true" keyProperty="itemId">
+        INSERT INTO prescription_item (
+            prescription_id,
+            drug_id,
+            quantity,
+            usage_method,
+            price
+        ) VALUES (
+            #{prescriptionId},
+            #{drugId},
+            #{quantity},
+            #{usageMethod},
+            #{price}
+        )
+    </insert>
+
+    <!-- 更新处方明细信息 -->
+    <update id="updatePrescriptionItem" parameterType="org.code.privateclinic.bean.PrescriptionItem">
+        UPDATE prescription_item
+        <set>
+            <if test="prescriptionId != null">
+                prescription_id = #{prescriptionId},
+            </if>
+            <if test="drugId != null">
+                drug_id = #{drugId},
+            </if>
+            <if test="quantity != null">
+                quantity = #{quantity},
+            </if>
+            <if test="usageMethod != null and usageMethod != ''">
+                usage_method = #{usageMethod},
+            </if>
+            <if test="price != null">
+                price = #{price},
+            </if>
+        </set>
+        WHERE item_id = #{itemId}
+    </update>
+
+    <!-- 删除处方明细 -->
+    <delete id="deletePrescriptionItem">
+        DELETE FROM prescription_item
+        WHERE item_id = #{itemId}
+    </delete>
+
+    <!-- 根据处方ID删除所有处方明细 -->
+    <delete id="deletePrescriptionItemByPrescriptionId">
+        DELETE FROM prescription_item
+        WHERE prescription_id = #{prescriptionId}
+    </delete>
+
+</mapper>
+
