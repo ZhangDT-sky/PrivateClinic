@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.code.privateclinic.mapper.PatientMapper">
+    
+    <!-- 查询所有患者列表 -->
+    <select id="getPatientList" resultType="org.code.privateclinic.bean.Patient">
+        SELECT
+            patient_id AS patientId,
+            patient_name AS patientName,
+            gender,
+            age,
+            phone,
+            address,
+            remark,
+            doctor_id AS doctorId,
+            create_time AS createTime,
+            update_time AS updateTime
+        FROM patient
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 根据ID查询患者 -->
+    <select id="getPatientById" resultType="org.code.privateclinic.bean.Patient">
+        SELECT
+            patient_id AS patientId,
+            patient_name AS patientName,
+            gender,
+            age,
+            phone,
+            address,
+            remark,
+            doctor_id AS doctorId,
+            create_time AS createTime,
+            update_time AS updateTime
+        FROM patient
+        WHERE patient_id = #{patientId}
+    </select>
+
+    <!-- 根据医生ID查询患者列表 -->
+    <select id="getPatientByDoctorId" resultType="org.code.privateclinic.bean.Patient">
+        SELECT
+            patient_id AS patientId,
+            patient_name AS patientName,
+            gender,
+            age,
+            phone,
+            address,
+            remark,
+            doctor_id AS doctorId,
+            create_time AS createTime,
+            update_time AS updateTime
+        FROM patient
+        WHERE doctor_id = #{doctorId}
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 插入患者 -->
+    <insert id="addPatient" parameterType="org.code.privateclinic.bean.Patient" useGeneratedKeys="true" keyProperty="patientId">
+        INSERT INTO patient (
+            patient_name,
+            gender,
+            age,
+            phone,
+            address,
+            remark,
+            doctor_id
+        ) VALUES (
+            #{patientName},
+            #{gender},
+            #{age},
+            #{phone},
+            #{address},
+            #{remark},
+            #{doctorId}
+        )
+    </insert>
+
+    <!-- 更新患者信息 -->
+    <update id="updatePatient" parameterType="org.code.privateclinic.bean.Patient">
+        UPDATE patient
+        <set>
+            <if test="patientName != null and patientName != ''">
+                patient_name = #{patientName},
+            </if>
+            <if test="gender != null and gender != ''">
+                gender = #{gender},
+            </if>
+            <if test="age != null">
+                age = #{age},
+            </if>
+            <if test="phone != null and phone != ''">
+                phone = #{phone},
+            </if>
+            <if test="address != null and address != ''">
+                address = #{address},
+            </if>
+            <if test="remark != null and remark != ''">
+                remark = #{remark},
+            </if>
+            <if test="doctorId != null">
+                doctor_id = #{doctorId},
+            </if>
+        </set>
+        WHERE patient_id = #{patientId}
+    </update>
+
+    <!-- 删除患者 -->
+    <delete id="deletePatient">
+        DELETE FROM patient
+        WHERE patient_id = #{patientId}
+    </delete>
+
+</mapper>
+
