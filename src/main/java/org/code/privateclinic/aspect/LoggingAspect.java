@@ -12,16 +12,6 @@ import org.springframework.stereotype.Component;
 import java.lang.reflect.Method;
 import java.util.Collection;
 
-import lombok.extern.slf4j.Slf4j;
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Pointcut;
-import org.aspectj.lang.reflect.MethodSignature;
-import org.springframework.stereotype.Component;
-import java.lang.reflect.Method;
-import java.util.Collection;
-
 /**
  * 日志切面类（AOP）
  * 核心作用：基于自定义注解@Loggable实现「方法执行日志的统一记录」，无需在每个方法中重复编写日志代码
@@ -31,9 +21,9 @@ import java.util.Collection;
  * 3. 记录方法执行异常日志（包含错误信息、耗时）
  * 4. 计算并输出方法执行耗时
  */
-@Slf4j // Lombok注解，自动生成log日志对象，无需手动new Logger
-@Aspect // 标识这是一个AOP切面类，Spring会扫描并加载
-@Component // 标识为Spring组件，让Spring容器管理该类的生命周期
+@Slf4j
+@Aspect // AOP切面类
+@Component
 public class LoggingAspect {
 
     /**
@@ -46,7 +36,7 @@ public class LoggingAspect {
 
     /**
      * 环绕通知（Around）：在目标方法执行前后执行自定义逻辑
-     * 环绕通知是功能最完整的通知类型，可控制目标方法是否执行、修改返回值、处理异常
+     * 可控制目标方法是否执行、修改返回值、处理异常
      */
     @Around("loggableMethods()") // 指定该通知作用于上面定义的loggableMethods切入点
     public Object logAround(ProceedingJoinPoint joinPoint) throws Throwable {
