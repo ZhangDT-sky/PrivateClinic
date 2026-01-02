@@ -31,11 +31,11 @@ public class AuthServiceImpl implements AuthService {
             throw new RuntimeException("密码不能为空");
         }
         
-        String username = loginRequestDTO.getUserId();
+        String userName = loginRequestDTO.getUserId();
         String password = loginRequestDTO.getPassword();
         
         // 查询用户（自动从 doctor 或 admin 表中查找）
-        User user = userService.getUserByUsername(username);
+        User user = userService.getUserByUserName(userName);
         if (user == null) {
             throw new RuntimeException("用户名或密码错误");
         }
@@ -53,8 +53,7 @@ public class AuthServiceImpl implements AuthService {
         // 生成 JWT Token
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", user.getUserId().toString());
-        claims.put("username", user.getUsername());
-        claims.put("userName", user.getUsername());
+        claims.put("userName", user.getUserName());
         claims.put("userType", user.getRole());
         claims.put("userRole", user.getRole());
         

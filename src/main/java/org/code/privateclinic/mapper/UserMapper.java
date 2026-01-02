@@ -13,7 +13,7 @@ public interface UserMapper {
 
     User selectUserById(Long id);
 
-    User selectUserByUsername(String username);
+    User selectUserByUserName(String userName);
 
     List<User> selectUserByRole(String role);
 

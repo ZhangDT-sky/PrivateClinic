@@ -15,15 +15,12 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class User {
     private Long userId;
-    @NotBlank(message = "用户名不能为空")
-    @Size(max = 50, message = "用户名长度不能超过50个字符")
-    private String username;
 
     @NotBlank(message = "密码不能为空")
     @Size(max = 100, message = "密码长度不能超过100个字符")
     private String password;
     
-
+    @NotBlank(message = "用户姓名不能为空")
     @Size(max = 50, message = "用户姓名长度不能超过50个字符")
     private String userName;
     

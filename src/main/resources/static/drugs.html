@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>药品管理</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: #f5f5f5;
+        }
+
+        .header {
+            background: white;
+            padding: 15px 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        .nav-link {
+            color: #4a90e2;
+            text-decoration: none;
+            margin-right: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .toolbar {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .btn-primary {
+            background: #4a90e2;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #357abd;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #e67e22;
+        }
+
+        table {
+            width: 100%;
+            background: white;
+            border-collapse: collapse;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f8f9fa;
+            color: #333;
+            font-weight: 500;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            color: #333;
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .message {
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .stock-low {
+            color: #e74c3c;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>药品管理</h1>
+        <div>
+            <a href="dashboard.html" class="nav-link">返回首页</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="toolbar">
+            <h2>药品列表</h2>
+            <button class="btn btn-primary" onclick="showAddModal()">添加药品</button>
+        </div>
+
+        <div class="message" id="message"></div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>药品名称</th>
+                    <th>规格</th>
+                    <th>价格</th>
+                    <th>库存</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody id="drugTableBody">
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 添加/编辑模态框 -->
+    <div class="modal" id="drugModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">添加药品</h2>
+            </div>
+            <form id="drugForm">
+                <input type="hidden" id="drugId">
+                <div class="form-group">
+                    <label>药品名称 *</label>
+                    <input type="text" id="drugName" required>
+                </div>
+                <div class="form-group">
+                    <label>规格 *</label>
+                    <input type="text" id="specification" required>
+                </div>
+                <div class="form-group">
+                    <label>价格</label>
+                    <input type="number" id="price" step="0.01" min="0">
+                </div>
+                <div class="form-group">
+                    <label>库存</label>
+                    <input type="number" id="stock" min="0">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 更新库存模态框 -->
+    <div class="modal" id="stockModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>更新库存</h2>
+            </div>
+            <form id="stockForm">
+                <input type="hidden" id="stockDrugId">
+                <div class="form-group">
+                    <label>库存数量</label>
+                    <input type="number" id="stockValue" min="0" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeStockModal()">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8085';
+        const token = localStorage.getItem('token');
+        
+        if (!token) {
+            window.location.href = 'index.html';
+        }
+
+        const headers = {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        };
+
+        let editingId = null;
+
+        async function loadDrugs() {
+            try {
+                const response = await fetch(`${API_BASE}/drug/list`, { headers });
+                const result = await response.json();
+                
+                if (result.code === 200) {
+                    renderDrugs(result.data || []);
+                } else {
+                    showMessage(result.message || '加载失败', 'error');
+                }
+            } catch (error) {
+                showMessage('网络错误', 'error');
+            }
+        }
+
+        function renderDrugs(drugs) {
+            const tbody = document.getElementById('drugTableBody');
+            tbody.innerHTML = drugs.map(d => {
+                const stockClass = (d.stock !== null && d.stock < 10) ? 'stock-low' : '';
+                const statusText = d.status === 1 ? '正常' : '停用';
+                return `
+                    <tr>
+                        <td>${d.drugId}</td>
+                        <td>${d.drugName || '-'}</td>
+                        <td>${d.specification || '-'}</td>
+                        <td>${d.price ? '¥' + parseFloat(d.price).toFixed(2) : '-'}</td>
+                        <td class="${stockClass}">${d.stock !== null ? d.stock : '-'}</td>
+                        <td>${statusText}</td>
+                        <td>
+                            <button class="btn btn-primary" style="padding: 5px 10px; font-size: 12px;" onclick="editDrug(${d.drugId})">编辑</button>
+                            <button class="btn btn-warning" style="padding: 5px 10px; font-size: 12px;" onclick="updateStock(${d.drugId})">更新库存</button>
+                            <button class="btn btn-danger" style="padding: 5px 10px; font-size: 12px;" onclick="deleteDrug(${d.drugId})">删除</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function showAddModal() {
+            editingId = null;
+            document.getElementById('modalTitle').textContent = '添加药品';
+            document.getElementById('drugForm').reset();
+            document.getElementById('drugId').value = '';
+            document.getElementById('drugModal').classList.add('show');
+        }
+
+        async function editDrug(id) {
+            try {
+                const response = await fetch(`${API_BASE}/drug/${id}`, { headers });
+                const result = await response.json();
+                
+                if (result.code === 200) {
+                    const d = result.data;
+                    editingId = id;
+                    document.getElementById('modalTitle').textContent = '编辑药品';
+                    document.getElementById('drugId').value = d.drugId;
+                    document.getElementById('drugName').value = d.drugName || '';
+                    document.getElementById('specification').value = d.specification || '';
+                    document.getElementById('price').value = d.price || '';
+                    document.getElementById('stock').value = d.stock !== null ? d.stock : '';
+                    document.getElementById('drugModal').classList.add('show');
+                } else {
+                    showMessage(result.message || '加载失败', 'error');
+                }
+            } catch (error) {
+                showMessage('网络错误', 'error');
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('drugModal').classList.remove('show');
+        }
+
+        function updateStock(id) {
+            document.getElementById('stockDrugId').value = id;
+            document.getElementById('stockValue').value = '';
+            document.getElementById('stockModal').classList.add('show');
+        }
+
+        function closeStockModal() {
+            document.getElementById('stockModal').classList.remove('show');
+        }
+
+        document.getElementById('drugForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const drug = {
+                drugName: document.getElementById('drugName').value,
+                specification: document.getElementById('specification').value,
+                price: document.getElementById('price').value ? parseFloat(document.getElementById('price').value) : 0,
+                stock: document.getElementById('stock').value ? parseInt(document.getElementById('stock').value) : null
+            };
+
+            if (editingId) {
+                drug.drugId = editingId;
+            }
+
+            try {
+                const url = `${API_BASE}/drug`;
+                const method = editingId ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method,
+                    headers,
+                    body: JSON.stringify(drug)
+                });
+
+                const result = await response.json();
+                
+                if (result.code === 200) {
+                    showMessage(result.message || (editingId ? '更新成功' : '添加成功'), 'success');
+                    closeModal();
+                    loadDrugs();
+                } else {
+                    showMessage(result.message || '操作失败', 'error');
+                }
+            } catch (error) {
+                showMessage('网络错误', 'error');
+            }
+        });
+
+        document.getElementById('stockForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const drugId = parseInt(document.getElementById('stockDrugId').value);
+            const stock = parseInt(document.getElementById('stockValue').value);
+
+            try {
+                const response = await fetch(`${API_BASE}/drug/stock/${drugId}?stock=${stock}`, {
+                    method: 'PUT',
+                    headers
+                });
+
+                const result = await response.json();
+                
+                if (result.code === 200) {
+                    showMessage(result.message || '更新成功', 'success');
+                    closeStockModal();
+                    loadDrugs();
+                } else {
+                    showMessage(result.message || '更新失败', 'error');
+                }
+            } catch (error) {
+                showMessage('网络错误', 'error');
+            }
+        });
+
+        async function deleteDrug(id) {
+            if (!confirm('确定要删除该药品吗？')) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/drug/${id}`, {
+                    method: 'DELETE',
+                    headers
+                });
+
+                const result = await response.json();
+                
+                if (result.code === 200) {
+                    showMessage(result.message || '删除成功', 'success');
+                    loadDrugs();
+                } else {
+                    showMessage(result.message || '删除失败', 'error');
+                }
+            } catch (error) {
+                showMessage('网络错误', 'error');
+            }
+        }
+
+        function showMessage(text, type) {
+            const msg = document.getElementById('message');
+            msg.textContent = text;
+            msg.className = `message ${type} show`;
+            setTimeout(() => {
+                msg.classList.remove('show');
+            }, 3000);
+        }
+
+        loadDrugs();
+    </script>
+</body>
+</html>
+

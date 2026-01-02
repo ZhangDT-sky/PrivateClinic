@@ -8,7 +8,6 @@
     <select id="selectUser" resultType="org.code.privateclinic.bean.User">
         SELECT
             user_id AS userId,
-            username,
             password,
             user_name AS userName,
             role,
@@ -25,7 +24,6 @@
     <select id="selectUserById" resultType="org.code.privateclinic.bean.User">
         SELECT
             user_id AS userId,
-            username,
             password,
             user_name AS userName,
             role,
@@ -38,10 +36,9 @@
     </select>
 
     <!-- 根据用户名查询用户 -->
-    <select id="selectUserByUsername" resultType="org.code.privateclinic.bean.User">
+    <select id="selectUserByUserName" resultType="org.code.privateclinic.bean.User">
         SELECT
             user_id AS userId,
-            username,
             password,
             user_name AS userName,
             role,
@@ -50,14 +47,13 @@
             create_time AS createTime,
             update_time AS updateTime
         FROM user
-        WHERE username = #{username}
+        WHERE user_name = #{userName}
     </select>
 
     <!-- 根据角色查询用户列表 -->
     <select id="selectUserByRole" resultType="org.code.privateclinic.bean.User">
         SELECT
             user_id AS userId,
-            username,
             password,
             user_name AS userName,
             role,
@@ -73,14 +69,12 @@
     <!-- 插入用户 -->
     <insert id="insertUser" parameterType="org.code.privateclinic.bean.User" useGeneratedKeys="true" keyProperty="userId">
         INSERT INTO user (
-            username,
             password,
             user_name,
             role,
             phone,
             status
         ) VALUES (
-            #{username},
             #{password},
             #{userName},
             #{role},
@@ -93,9 +87,6 @@
     <update id="updateUser" parameterType="org.code.privateclinic.bean.User">
         UPDATE user
         <set>
-            <if test="username != null and username != ''">
-                username = #{username},
-            </if>
             <if test="password != null and password != ''">
                 password = #{password},
             </if>

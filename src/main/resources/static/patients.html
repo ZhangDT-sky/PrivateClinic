@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>患者管理</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: #f5f5f5;
+        }
+
+        .header {
+            background: white;
+            padding: 15px 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        .nav-link {
+            color: #4a90e2;
+            text-decoration: none;
+            margin-right: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .toolbar {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .btn-primary {
+            background: #4a90e2;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #357abd;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+
+        table {
+            width: 100%;
+            background: white;
+            border-collapse: collapse;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f8f9fa;
+            color: #333;
+            font-weight: 500;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            color: #333;
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .message {
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>患者管理</h1>
+        <div>
+            <a href="dashboard.html" class="nav-link">返回首页</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="toolbar">
+            <h2>患者列表</h2>
+            <button class="btn btn-primary" onclick="showAddModal()">添加患者</button>
+        </div>
+
+        <div class="message" id="message"></div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>姓名</th>
+                    <th>性别</th>
+                    <th>年龄</th>
+                    <th>手机号</th>
+                    <th>地址</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody id="patientTableBody">
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 添加/编辑模态框 -->
+    <div class="modal" id="patientModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">添加患者</h2>
+            </div>
+            <form id="patientForm">
+                <input type="hidden" id="patientId">
+                <div class="form-group">
+                    <label>患者姓名 *</label>
+                    <input type="text" id="patientName" required>
+                </div>
+                <div class="form-group">
+                    <label>性别</label>
+                    <select id="gender">
+                        <option value="">请选择</option>
+                        <option value="男">男</option>
+                        <option value="女">女</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>年龄</label>
+                    <input type="number" id="age" min="0">
+                </div>
+                <div class="form-group">
+                    <label>手机号</label>
+                    <input type="text" id="phone">
+                </div>
+                <div class="form-group">
+                    <label>地址</label>
+                    <textarea id="address" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>备注</label>
+                    <textarea id="remark" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>负责医生ID *</label>
+                    <input type="number" id="doctorId" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8085';
+        const token = localStorage.getItem('token');
+        
+        if (!token) {
+            window.location.href = 'index.html';
+        }
+
+        const headers = {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        };
+
+        let editingId = null;
+
+        async function loadPatients() {
+            try {
+                const response = await fetch(`${API_BASE}/patient/list`, { headers });
+                const result = await response.json();
+                
+                if (result.code === 200) {
+                    renderPatients(result.data || []);
+                } else {
+                    showMessage(result.message || '加载失败', 'error');
+                }
+            } catch (error) {
+                showMessage('网络错误', 'error');
+            }
+        }
+
+        function renderPatients(patients) {
+            const tbody = document.getElementById('patientTableBody');
+            tbody.innerHTML = patients.map(p => `
+                <tr>
+                    <td>${p.patientId}</td>
+                    <td>${p.patientName || '-'}</td>
+                    <td>${p.gender || '-'}</td>
+                    <td>${p.age || '-'}</td>
+                    <td>${p.phone || '-'}</td>
+                    <td>${p.address || '-'}</td>
+                    <td>
+                        <button class="btn btn-primary" style="padding: 5px 10px; font-size: 12px;" onclick="editPatient(${p.patientId})">编辑</button>
+                        <button class="btn btn-danger" style="padding: 5px 10px; font-size: 12px;" onclick="deletePatient(${p.patientId})">删除</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function showAddModal() {
+            editingId = null;
+            document.getElementById('modalTitle').textContent = '添加患者';
+            document.getElementById('patientForm').reset();
+            document.getElementById('patientId').value = '';
+            document.getElementById('patientModal').classList.add('show');
+        }
+
+        async function editPatient(id) {
+            try {
+                const response = await fetch(`${API_BASE}/patient/${id}`, { headers });
+                const result = await response.json();
+                
+                if (result.code === 200) {
+                    const p = result.data;
+                    editingId = id;
+                    document.getElementById('modalTitle').textContent = '编辑患者';
+                    document.getElementById('patientId').value = p.patientId;
+                    document.getElementById('patientName').value = p.patientName || '';
+                    document.getElementById('gender').value = p.gender || '';
+                    document.getElementById('age').value = p.age || '';
+                    document.getElementById('phone').value = p.phone || '';
+                    document.getElementById('address').value = p.address || '';
+                    document.getElementById('remark').value = p.remark || '';
+                    document.getElementById('doctorId').value = p.doctorId || '';
+                    document.getElementById('patientModal').classList.add('show');
+                } else {
+                    showMessage(result.message || '加载失败', 'error');
+                }
+            } catch (error) {
+                showMessage('网络错误', 'error');
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('patientModal').classList.remove('show');
+        }
+
+        document.getElementById('patientForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const patient = {
+                patientName: document.getElementById('patientName').value,
+                gender: document.getElementById('gender').value,
+                age: document.getElementById('age').value ? parseInt(document.getElementById('age').value) : null,
+                phone: document.getElementById('phone').value,
+                address: document.getElementById('address').value,
+                remark: document.getElementById('remark').value,
+                doctorId: parseInt(document.getElementById('doctorId').value)
+            };
+
+            if (editingId) {
+                patient.patientId = editingId;
+            }
+
+            try {
+                const url = editingId ? `${API_BASE}/patient` : `${API_BASE}/patient`;
+                const method = editingId ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method,
+                    headers,
+                    body: JSON.stringify(patient)
+                });
+
+                const result = await response.json();
+                
+                if (result.code === 200) {
+                    showMessage(result.message || (editingId ? '更新成功' : '添加成功'), 'success');
+                    closeModal();
+                    loadPatients();
+                } else {
+                    showMessage(result.message || '操作失败', 'error');
+                }
+            } catch (error) {
+                showMessage('网络错误', 'error');
+            }
+        });
+
+        async function deletePatient(id) {
+            if (!confirm('确定要删除该患者吗？')) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/patient/${id}`, {
+                    method: 'DELETE',
+                    headers
+                });
+
+                const result = await response.json();
+                
+                if (result.code === 200) {
+                    showMessage(result.message || '删除成功', 'success');
+                    loadPatients();
+                } else {
+                    showMessage(result.message || '删除失败', 'error');
+                }
+            } catch (error) {
+                showMessage('网络错误', 'error');
+            }
+        }
+
+        function showMessage(text, type) {
+            const msg = document.getElementById('message');
+            msg.textContent = text;
+            msg.className = `message ${type} show`;
+            setTimeout(() => {
+                msg.classList.remove('show');
+            }, 3000);
+        }
+
+        loadPatients();
+    </script>
+</body>
+</html>
+

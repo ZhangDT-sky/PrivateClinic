@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户管理</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: #f5f5f5;
+        }
+
+        .header {
+            background: white;
+            padding: 15px 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        .nav-link {
+            color: #4a90e2;
+            text-decoration: none;
+            margin-right: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .toolbar {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .btn-primary {
+            background: #4a90e2;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #357abd;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+
+        table {
+            width: 100%;
+            background: white;
+            border-collapse: collapse;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f8f9fa;
+            color: #333;
+            font-weight: 500;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            color: #333;
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .message {
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .role-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .role-ADMIN {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .role-DOCTOR {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>用户管理</h1>
+        <div>
+            <a href="dashboard.html" class="nav-link">返回首页</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="toolbar">
+            <h2>用户列表</h2>
+            <button class="btn btn-primary" onclick="showAddModal()">添加用户</button>
+        </div>
+
+        <div class="message" id="message"></div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>姓名</th>
+                    <th>角色</th>
+                    <th>手机号</th>
+                    <th>状态</th>
+                    <th>创建时间</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody id="userTableBody">
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 添加/编辑模态框 -->
+    <div class="modal" id="userModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">添加用户</h2>
+            </div>
+            <form id="userForm">
+                <input type="hidden" id="userId">
+                <div class="form-group">
+                    <label>姓名 *</label>
+                    <input type="text" id="userName" required>
+                </div>
+                <div class="form-group">
+                    <label>密码 <span id="passwordHint" style="color: #999; font-size: 12px;">(编辑时留空则不修改)</span></label>
+                    <input type="password" id="password">
+                </div>
+                <div class="form-group">
+                    <label>角色 *</label>
+                    <select id="role" required>
+                        <option value="">请选择</option>
+                        <option value="ADMIN">管理员</option>
+                        <option value="DOCTOR">医生</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>手机号</label>
+                    <input type="text" id="phone">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8085';
+        const token = localStorage.getItem('token');
+        
+        if (!token) {
+            window.location.href = 'index.html';
+        }
+
+        const headers = {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        };
+
+        let editingId = null;
+
+        async function loadUsers() {
+            try {
+                const response = await fetch(`${API_BASE}/user/list`, { headers });
+                const result = await response.json();
+                
+                if (result.code === 200) {
+                    renderUsers(result.data || []);
+                } else {
+                    showMessage(result.message || '加载失败', 'error');
+                }
+            } catch (error) {
+                showMessage('网络错误', 'error');
+            }
+        }
+
+        function renderUsers(users) {
+            const tbody = document.getElementById('userTableBody');
+            tbody.innerHTML = users.map(u => {
+                const roleText = u.role === 'ADMIN' ? '管理员' : '医生';
+                const statusText = u.status === 1 ? '正常' : '停用';
+                const createTime = u.createTime ? new Date(u.createTime).toLocaleString('zh-CN') : '-';
+                return `
+                    <tr>
+                        <td>${u.userId}</td>
+                        <td>${u.userName || '-'}</td>
+                        <td><span class="role-badge role-${u.role}">${roleText}</span></td>
+                        <td>${u.phone || '-'}</td>
+                        <td>${statusText}</td>
+                        <td>${createTime}</td>
+                        <td>
+                            <button class="btn btn-primary" style="padding: 5px 10px; font-size: 12px;" onclick="editUser(${u.userId})">编辑</button>
+                            <button class="btn btn-danger" style="padding: 5px 10px; font-size: 12px;" onclick="deleteUser(${u.userId})">删除</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function showAddModal() {
+            editingId = null;
+            document.getElementById('modalTitle').textContent = '添加用户';
+            document.getElementById('userForm').reset();
+            document.getElementById('userId').value = '';
+            document.getElementById('password').required = true;
+            document.getElementById('passwordHint').style.display = 'none';
+            document.getElementById('userModal').classList.add('show');
+        }
+
+        async function editUser(id) {
+            try {
+                const response = await fetch(`${API_BASE}/user/${id}`, { headers });
+                const result = await response.json();
+                
+                if (result.code === 200) {
+                    const u = result.data;
+                    editingId = id;
+                    document.getElementById('modalTitle').textContent = '编辑用户';
+                    document.getElementById('userId').value = u.userId;
+                    document.getElementById('password').value = '';
+                    document.getElementById('password').required = false;
+                    document.getElementById('passwordHint').style.display = 'inline';
+                    document.getElementById('userName').value = u.userName || '';
+                    document.getElementById('role').value = u.role || '';
+                    document.getElementById('phone').value = u.phone || '';
+                    document.getElementById('userModal').classList.add('show');
+                } else {
+                    showMessage(result.message || '加载失败', 'error');
+                }
+            } catch (error) {
+                showMessage('网络错误', 'error');
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('userModal').classList.remove('show');
+        }
+
+        document.getElementById('userForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const user = {
+                userName: document.getElementById('userName').value,
+                role: document.getElementById('role').value,
+                phone: document.getElementById('phone').value
+            };
+
+            const password = document.getElementById('password').value;
+            if (password) {
+                user.password = password;
+            }
+
+            if (editingId) {
+                user.userId = editingId;
+            }
+
+            try {
+                const url = `${API_BASE}/user`;
+                const method = editingId ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method,
+                    headers,
+                    body: JSON.stringify(user)
+                });
+
+                const result = await response.json();
+                
+                if (result.code === 200) {
+                    showMessage(result.message || (editingId ? '更新成功' : '添加成功'), 'success');
+                    closeModal();
+                    loadUsers();
+                } else {
+                    showMessage(result.message || '操作失败', 'error');
+                }
+            } catch (error) {
+                showMessage('网络错误', 'error');
+            }
+        });
+
+        async function deleteUser(id) {
+            if (!confirm('确定要删除该用户吗？')) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/user/${id}`, {
+                    method: 'DELETE',
+                    headers
+                });
+
+                const result = await response.json();
+                
+                if (result.code === 200) {
+                    showMessage(result.message || '删除成功', 'success');
+                    loadUsers();
+                } else {
+                    showMessage(result.message || '删除失败', 'error');
+                }
+            } catch (error) {
+                showMessage('网络错误', 'error');
+            }
+        }
+
+        function showMessage(text, type) {
+            const msg = document.getElementById('message');
+            msg.textContent = text;
+            msg.className = `message ${type} show`;
+            setTimeout(() => {
+                msg.classList.remove('show');
+            }, 3000);
+        }
+
+        loadUsers();
+    </script>
+</body>
+</html>
+

@@ -18,7 +18,7 @@ public interface UserService {
     /**
      * 根据用户名获取用户信息
      */
-    User getUserByUsername(String username);
+    User getUserByUserName(String userName);
 
     /**
      * 根据角色获取用户列表

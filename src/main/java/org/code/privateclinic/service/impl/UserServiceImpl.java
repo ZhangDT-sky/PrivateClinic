@@ -64,8 +64,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Loggable("根据用户名查询用户信息")
-    public User getUserByUsername(String username) {
-        return userMapper.selectUserByUsername(username);
+    public User getUserByUserName(String userName) {
+        return userMapper.selectUserByUserName(userName);
     }
 
     @Override
@@ -77,7 +77,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Loggable("添加用户")
     public int addUser(User user) {
-        User existingUser = userMapper.selectUserByUsername(user.getUsername());
+        User existingUser = userMapper.selectUserByUserName(user.getUserName());
         if (existingUser != null) {
             throw new RuntimeException("用户名已存在");
         }
@@ -103,8 +103,8 @@ public class UserServiceImpl implements UserService {
         if (user.getUserId() == null) {
             throw new RuntimeException("用户ID不能为空");
         }
-        if (user.getUsername() != null && !user.getUsername().isEmpty()) {
-            User existingUser = userMapper.selectUserByUsername(user.getUsername());
+        if (user.getUserName() != null && !user.getUserName().isEmpty()) {
+            User existingUser = userMapper.selectUserByUserName(user.getUserName());
             if (existingUser != null && !existingUser.getUserId().equals(user.getUserId())) {
                 throw new RuntimeException("用户名已被使用");
             }

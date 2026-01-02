@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>处方管理</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: #f5f5f5;
+        }
+
+        .header {
+            background: white;
+            padding: 15px 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        .nav-link {
+            color: #4a90e2;
+            text-decoration: none;
+            margin-right: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .toolbar {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .btn-primary {
+            background: #4a90e2;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #357abd;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+
+        table {
+            width: 100%;
+            background: white;
+            border-collapse: collapse;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f8f9fa;
+            color: #333;
+            font-weight: 500;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            color: #333;
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .message {
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .items-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .item-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: flex-end;
+        }
+
+        .item-row input {
+            flex: 1;
+        }
+
+        .item-row button {
+            padding: 10px 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>处方管理</h1>
+        <div>
+            <a href="dashboard.html" class="nav-link">返回首页</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="toolbar">
+            <h2>处方列表</h2>
+            <button class="btn btn-primary" onclick="showAddModal()">添加处方</button>
+        </div>
+
+        <div class="message" id="message"></div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>病例ID</th>
+                    <th>医生ID</th>
+                    <th>总金额</th>
+                    <th>创建时间</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody id="prescriptionTableBody">
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 添加/编辑模态框 -->
+    <div class="modal" id="prescriptionModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">添加处方</h2>
+            </div>
+            <form id="prescriptionForm">
+                <input type="hidden" id="prescriptionId">
+                <div class="form-group">
+                    <label>病例ID *</label>
+                    <input type="number" id="caseId" required>
+                </div>
+                <div class="form-group">
+                    <label>医生ID *</label>
+                    <input type="number" id="doctorId" required>
+                </div>
+                <div class="form-group">
+                    <label>总金额</label>
+                    <input type="number" id="totalAmount" step="0.01" min="0">
+                </div>
+                <div class="items-section">
+                    <h3 style="margin-bottom: 15px; font-size: 16px; color: #333;">处方明细</h3>
+                    <div id="itemsContainer"></div>
+                    <button type="button" class="btn btn-secondary" onclick="addItem()" style="margin-top: 10px;">添加药品</button>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8085';
+        const token = localStorage.getItem('token');
+        
+        if (!token) {
+            window.location.href = 'index.html';
+        }
+
+        const headers = {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        };
+
+        let editingId = null;
+        let items = [];
+
+        async function loadPrescriptions() {
+            try {
+                const response = await fetch(`${API_BASE}/prescription/list`, { headers });
+                const result = await response.json();
+                
+                if (result.code === 200) {
+                    renderPrescriptions(result.data || []);
+                } else {
+                    showMessage(result.message || '加载失败', 'error');
+                }
+            } catch (error) {
+                showMessage('网络错误', 'error');
+            }
+        }
+
+        function renderPrescriptions(prescriptions) {
+            const tbody = document.getElementById('prescriptionTableBody');
+            tbody.innerHTML = prescriptions.map(p => {
+                const createTime = p.createTime ? new Date(p.createTime).toLocaleString('zh-CN') : '-';
+                return `
+                    <tr>
+                        <td>${p.prescriptionId}</td>
+                        <td>${p.caseId}</td>
+                        <td>${p.doctorId}</td>
+                        <td>${p.totalAmount ? '¥' + parseFloat(p.totalAmount).toFixed(2) : '-'}</td>
+                        <td>${createTime}</td>
+                        <td>
+                            <button class="btn btn-primary" style="padding: 5px 10px; font-size: 12px;" onclick="viewItems(${p.prescriptionId})">查看明细</button>
+                            <button class="btn btn-danger" style="padding: 5px 10px; font-size: 12px;" onclick="deletePrescription(${p.prescriptionId})">删除</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function showAddModal() {
+            editingId = null;
+            items = [];
+            document.getElementById('modalTitle').textContent = '添加处方';
+            document.getElementById('prescriptionForm').reset();
+            document.getElementById('prescriptionId').value = '';
+            document.getElementById('itemsContainer').innerHTML = '';
+            document.getElementById('prescriptionModal').classList.add('show');
+        }
+
+        function addItem() {
+            const container = document.getElementById('itemsContainer');
+            const itemIndex = items.length;
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'item-row';
+            itemDiv.innerHTML = `
+                <input type="number" placeholder="药品ID" class="item-drugId" required>
+                <input type="number" placeholder="数量" class="item-quantity" min="1" required>
+                <input type="text" placeholder="用法用量" class="item-usage">
+                <input type="number" placeholder="单价" class="item-price" step="0.01" min="0">
+                <button type="button" class="btn btn-danger" onclick="removeItem(${itemIndex})">删除</button>
+            `;
+            container.appendChild(itemDiv);
+            items.push({});
+        }
+
+        function removeItem(index) {
+            const container = document.getElementById('itemsContainer');
+            container.children[index].remove();
+            items.splice(index, 1);
+            // 重新渲染以更新索引
+            const rows = container.querySelectorAll('.item-row');
+            rows.forEach((row, idx) => {
+                const btn = row.querySelector('button');
+                btn.setAttribute('onclick', `removeItem(${idx})`);
+            });
+        }
+
+        async function viewItems(prescriptionId) {
+            try {
+                const response = await fetch(`${API_BASE}/prescription-item/prescription/${prescriptionId}`, { headers });
+                const result = await response.json();
+                
+                if (result.code === 200) {
+                    const itemsList = result.data || [];
+                    let msg = '处方明细：\n';
+                    itemsList.forEach(item => {
+                        msg += `药品ID: ${item.drugId}, 数量: ${item.quantity}, 用法: ${item.usageMethod || '-'}, 单价: ${item.price || '-'}\n`;
+                    });
+                    alert(msg || '暂无明细');
+                } else {
+                    showMessage(result.message || '加载失败', 'error');
+                }
+            } catch (error) {
+                showMessage('网络错误', 'error');
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('prescriptionModal').classList.remove('show');
+        }
+
+        document.getElementById('prescriptionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const prescription = {
+                caseId: parseInt(document.getElementById('caseId').value),
+                doctorId: parseInt(document.getElementById('doctorId').value)
+            };
+
+            const totalAmount = document.getElementById('totalAmount').value;
+            if (totalAmount) {
+                prescription.totalAmount = parseFloat(totalAmount);
+            }
+
+            if (editingId) {
+                prescription.prescriptionId = editingId;
+            }
+
+            try {
+                const url = `${API_BASE}/prescription`;
+                const method = editingId ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method,
+                    headers,
+                    body: JSON.stringify(prescription)
+                });
+
+                const result = await response.json();
+                
+                if (result.code === 200) {
+                    const prescriptionId = result.data?.prescriptionId || editingId;
+                    
+                    // 保存处方明细
+                    const container = document.getElementById('itemsContainer');
+                    const rows = container.querySelectorAll('.item-row');
+                    for (const row of rows) {
+                        const drugId = row.querySelector('.item-drugId').value;
+                        const quantity = row.querySelector('.item-quantity').value;
+                        const usage = row.querySelector('.item-usage').value;
+                        const price = row.querySelector('.item-price').value;
+                        
+                        if (drugId && quantity) {
+                            const item = {
+                                prescriptionId: prescriptionId,
+                                drugId: parseInt(drugId),
+                                quantity: parseInt(quantity),
+                                usageMethod: usage || null
+                            };
+                            if (price) {
+                                item.price = parseFloat(price);
+                            }
+                            
+                            await fetch(`${API_BASE}/prescription-item`, {
+                                method: 'POST',
+                                headers,
+                                body: JSON.stringify(item)
+                            });
+                        }
+                    }
+                    
+                    showMessage(result.message || (editingId ? '更新成功' : '添加成功'), 'success');
+                    closeModal();
+                    loadPrescriptions();
+                } else {
+                    showMessage(result.message || '操作失败', 'error');
+                }
+            } catch (error) {
+                showMessage('网络错误', 'error');
+            }
+        });
+
+        async function deletePrescription(id) {
+            if (!confirm('确定要删除该处方吗？')) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/prescription/${id}`, {
+                    method: 'DELETE',
+                    headers
+                });
+
+                const result = await response.json();
+                
+                if (result.code === 200) {
+                    showMessage(result.message || '删除成功', 'success');
+                    loadPrescriptions();
+                } else {
+                    showMessage(result.message || '删除失败', 'error');
+                }
+            } catch (error) {
+                showMessage('网络错误', 'error');
+            }
+        }
+
+        function showMessage(text, type) {
+            const msg = document.getElementById('message');
+            msg.textContent = text;
+            msg.className = `message ${type} show`;
+            setTimeout(() => {
+                msg.classList.remove('show');
+            }, 3000);
+        }
+
+        loadPrescriptions();
+    </script>
+</body>
+</html>
+

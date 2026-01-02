@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,10 +16,10 @@ import java.util.Map;
 @Component
 public class JwtTokenUtil {
 
-    @Value("{jwt.secret1}")
+    @Value("${jwt.secret1}")
     private String secret1;
 
-    @Value("{jwt.secret2}")
+    @Value("${jwt.secret2}")
     private String secret2;
 
     @Value("${jwt.expiration}")
@@ -33,14 +34,36 @@ public class JwtTokenUtil {
      */
     private SecretKey getSecretKey1() {
         if (secretKey1 == null) {
-            secretKey1 = Keys.hmacShaKeyFor(secret1.getBytes(StandardCharsets.UTF_8));
+            try {
+                byte[] keyBytes = secret1.getBytes(StandardCharsets.UTF_8);
+                // 确保密钥至少32字节（256位）
+                if (keyBytes.length < 32) {
+                    // 如果密钥太短，使用SHA-256哈希扩展到32字节
+                    MessageDigest digest = MessageDigest.getInstance("SHA-256");
+                    keyBytes = digest.digest(keyBytes);
+                }
+                secretKey1 = Keys.hmacShaKeyFor(keyBytes);
+            } catch (java.security.NoSuchAlgorithmException e) {
+                throw new RuntimeException("无法初始化JWT密钥", e);
+            }
         }
         return secretKey1;
     }
 
     private SecretKey getSecretKey2() {
         if (secretKey2 == null) {
-            secretKey2 = Keys.hmacShaKeyFor(secret2.getBytes(StandardCharsets.UTF_8));
+            try {
+                byte[] keyBytes = secret2.getBytes(StandardCharsets.UTF_8);
+                // 确保密钥至少32字节（256位）
+                if (keyBytes.length < 32) {
+                    // 如果密钥太短，使用SHA-256哈希扩展到32字节
+                    MessageDigest digest = MessageDigest.getInstance("SHA-256");
+                    keyBytes = digest.digest(keyBytes);
+                }
+                secretKey2 = Keys.hmacShaKeyFor(keyBytes);
+            } catch (java.security.NoSuchAlgorithmException e) {
+                throw new RuntimeException("无法初始化JWT密钥", e);
+            }
         }
         return secretKey2;
     }
@@ -114,6 +137,20 @@ public class JwtTokenUtil {
     public String getSubjectFromToken(String token) {
         Claims claims = validateToken(token);
         return claims != null ? claims.getSubject() : null;
+    }
+
+    /**
+     * 从Token中获取用户名
+     * @param token Token字符串
+     * @return 用户名
+     */
+    public String getUsernameFromToken(String token) {
+        Claims claims = validateToken(token);
+        if (claims != null) {
+            Object userName = claims.get("userName");
+            return userName != null ? userName.toString() : null;
+        }
+        return null;
     }
 
     /**
