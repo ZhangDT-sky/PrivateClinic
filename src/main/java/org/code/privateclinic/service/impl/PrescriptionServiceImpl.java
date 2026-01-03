@@ -3,9 +3,11 @@ package org.code.privateclinic.service.impl;
 import org.code.privateclinic.annotation.Loggable;
 import org.code.privateclinic.bean.Prescription;
 import org.code.privateclinic.mapper.PrescriptionMapper;
+import org.code.privateclinic.service.PrescriptionItemService;
 import org.code.privateclinic.service.PrescriptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -14,6 +16,9 @@ public class PrescriptionServiceImpl implements PrescriptionService {
 
     @Autowired
     private PrescriptionMapper prescriptionMapper;
+
+    @Autowired
+    private PrescriptionItemService prescriptionItemService;
 
     @Override
     @Loggable("查询处方列表")
@@ -62,11 +67,15 @@ public class PrescriptionServiceImpl implements PrescriptionService {
 
     @Override
     @Loggable("删除处方")
+    @Transactional(rollbackFor = Exception.class)
     public int deletePrescription(Long prescriptionId) {
         Prescription prescription = prescriptionMapper.getPrescriptionById(prescriptionId);
         if (prescription == null) {
             return 0;
         }
+        // 先删除处方项（子记录）
+        prescriptionItemService.deletePrescriptionItemByPrescriptionId(prescriptionId);
+        // 再删除处方（父记录）
         return prescriptionMapper.deletePrescription(prescriptionId);
     }
 }

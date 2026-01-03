@@ -2,10 +2,13 @@ package org.code.privateclinic.service.impl;
 
 import org.code.privateclinic.annotation.Loggable;
 import org.code.privateclinic.bean.MedicalCase;
+import org.code.privateclinic.bean.Prescription;
 import org.code.privateclinic.mapper.MedicalCaseMapper;
 import org.code.privateclinic.service.MedicalCaseService;
+import org.code.privateclinic.service.PrescriptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -14,6 +17,9 @@ public class MedicalCaseServiceImpl implements MedicalCaseService {
 
     @Autowired
     private MedicalCaseMapper medicalCaseMapper;
+
+    @Autowired
+    private PrescriptionService prescriptionService;
 
     @Override
     @Loggable("查询病例列表")
@@ -71,11 +77,18 @@ public class MedicalCaseServiceImpl implements MedicalCaseService {
 
     @Override
     @Loggable("删除病例")
+    @Transactional(rollbackFor = Exception.class)
     public int deleteMedicalCase(Long caseId) {
         MedicalCase medicalCase = medicalCaseMapper.getMedicalCaseById(caseId);
         if (medicalCase == null) {
             return 0;
         }
+        // 先删除该病例下的所有处方（deletePrescription方法内部会先删除处方项）
+        List<Prescription> prescriptions = prescriptionService.getPrescriptionByCaseId(caseId);
+        for (Prescription prescription : prescriptions) {
+            prescriptionService.deletePrescription(prescription.getPrescriptionId());
+        }
+        // 再删除病例（父记录）
         return medicalCaseMapper.deleteMedicalCase(caseId);
     }
 }
