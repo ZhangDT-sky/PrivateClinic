@@ -4,44 +4,69 @@
 
 <mapper namespace="org.code.privateclinic.mapper.PrescriptionItemMapper">
     
+    <!-- 结果映射 -->
+    <resultMap id="PrescriptionItemResultMap" type="org.code.privateclinic.bean.PrescriptionItem">
+        <id property="itemId" column="itemId"/>
+        <result property="prescriptionId" column="prescriptionId"/>
+        <result property="drugId" column="drugId"/>
+        <result property="quantity" column="quantity"/>
+        <result property="usageMethod" column="usageMethod"/>
+        <result property="price" column="price"/>
+        <result property="drugName" column="drugName"/>
+        <result property="specification" column="specification"/>
+        <result property="drugStatus" column="drugStatus"/>
+    </resultMap>
+    
     <!-- 查询所有处方明细列表 -->
-    <select id="getPrescriptionItemList" resultType="org.code.privateclinic.bean.PrescriptionItem">
+    <select id="getPrescriptionItemList" resultMap="PrescriptionItemResultMap">
         SELECT
-            item_id AS itemId,
-            prescription_id AS prescriptionId,
-            drug_id AS drugId,
-            quantity,
-            usage_method AS usageMethod,
-            price
-        FROM prescription_item
-        ORDER BY item_id DESC
+            pi.item_id AS itemId,
+            pi.prescription_id AS prescriptionId,
+            pi.drug_id AS drugId,
+            pi.quantity,
+            pi.usage_method AS usageMethod,
+            pi.price,
+            d.drug_name AS drugName,
+            d.specification,
+            d.status AS drugStatus
+        FROM prescription_item pi
+        LEFT JOIN drug d ON pi.drug_id = d.drug_id
+        ORDER BY pi.item_id DESC
     </select>
 
     <!-- 根据ID查询处方明细 -->
-    <select id="getPrescriptionItemById" resultType="org.code.privateclinic.bean.PrescriptionItem">
+    <select id="getPrescriptionItemById" resultMap="PrescriptionItemResultMap">
         SELECT
-            item_id AS itemId,
-            prescription_id AS prescriptionId,
-            drug_id AS drugId,
-            quantity,
-            usage_method AS usageMethod,
-            price
-        FROM prescription_item
-        WHERE item_id = #{itemId}
+            pi.item_id AS itemId,
+            pi.prescription_id AS prescriptionId,
+            pi.drug_id AS drugId,
+            pi.quantity,
+            pi.usage_method AS usageMethod,
+            pi.price,
+            d.drug_name AS drugName,
+            d.specification,
+            d.status AS drugStatus
+        FROM prescription_item pi
+        LEFT JOIN drug d ON pi.drug_id = d.drug_id
+        WHERE pi.item_id = #{itemId}
     </select>
 
     <!-- 根据处方ID查询处方明细列表 -->
-    <select id="getPrescriptionItemByPrescriptionId" resultType="org.code.privateclinic.bean.PrescriptionItem">
+    <select id="getPrescriptionItemByPrescriptionId" resultMap="PrescriptionItemResultMap">
         SELECT
-            item_id AS itemId,
-            prescription_id AS prescriptionId,
-            drug_id AS drugId,
-            quantity,
-            usage_method AS usageMethod,
-            price
-        FROM prescription_item
-        WHERE prescription_id = #{prescriptionId}
-        ORDER BY item_id DESC
+            pi.item_id AS itemId,
+            pi.prescription_id AS prescriptionId,
+            pi.drug_id AS drugId,
+            pi.quantity,
+            pi.usage_method AS usageMethod,
+            pi.price,
+            d.drug_name AS drugName,
+            d.specification,
+            d.status AS drugStatus
+        FROM prescription_item pi
+        LEFT JOIN drug d ON pi.drug_id = d.drug_id
+        WHERE pi.prescription_id = #{prescriptionId}
+        ORDER BY pi.item_id DESC
     </select>
 
     <!-- 插入处方明细 -->
