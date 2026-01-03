@@ -27,5 +27,10 @@ public class PrescriptionItem {
     private String usageMethod;
 
     private BigDecimal price;
+
+    // 药品信息字段（查询时关联 drug 表获取）
+    private String drugName;        // 药品名称
+    private String specification;   // 药品规格
+    private Integer drugStatus;     // 药品状态（用于判断是否已删除）
 }
 
