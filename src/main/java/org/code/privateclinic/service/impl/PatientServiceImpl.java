@@ -1,14 +1,11 @@
 package org.code.privateclinic.service.impl;
 
 import org.code.privateclinic.annotation.Loggable;
-import org.code.privateclinic.bean.MedicalCase;
 import org.code.privateclinic.bean.Patient;
 import org.code.privateclinic.mapper.PatientMapper;
-import org.code.privateclinic.service.MedicalCaseService;
 import org.code.privateclinic.service.PatientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -17,9 +14,6 @@ public class PatientServiceImpl implements PatientService {
 
     @Autowired
     private PatientMapper patientMapper;
-
-    @Autowired
-    private MedicalCaseService medicalCaseService;
 
     @Override
     @Loggable("查询患者列表")
@@ -59,18 +53,12 @@ public class PatientServiceImpl implements PatientService {
 
     @Override
     @Loggable("删除患者")
-    @Transactional(rollbackFor = Exception.class)
     public int deletePatient(Long patientId) {
         Patient patient = patientMapper.getPatientById(patientId);
         if (patient == null) {
             return 0;
         }
-        // 先删除该患者下的所有病历（deleteMedicalCase方法内部会先删除处方和处方项）
-        List<MedicalCase> medicalCases = medicalCaseService.getMedicalCaseByPatientId(patientId);
-        for (MedicalCase medicalCase : medicalCases) {
-            medicalCaseService.deleteMedicalCase(medicalCase.getCaseId());
-        }
-        // 再删除患者（父记录）
+        // 数据库级联删除：删除患者时，会自动删除相关的病历、处方和处方项
         return patientMapper.deletePatient(patientId);
     }
 }
