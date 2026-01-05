@@ -14,12 +14,6 @@ import java.util.Collection;
 
 /**
  * 日志切面类（AOP）
- * 核心作用：基于自定义注解@Loggable实现「方法执行日志的统一记录」，无需在每个方法中重复编写日志代码
- * 功能包含：
- * 1. 记录方法执行开始日志
- * 2. 记录方法执行成功日志（区分返回值类型：集合/非空/空）
- * 3. 记录方法执行异常日志（包含错误信息、耗时）
- * 4. 计算并输出方法执行耗时
  */
 @Slf4j
 @Aspect // AOP切面类
@@ -31,7 +25,7 @@ public class LoggingAspect {
      */
     @Pointcut("@annotation(org.code.privateclinic.annotation.Loggable)")
     public void loggableMethods() {
-        // 切入点方法无需编写业务逻辑，仅作为「切入点标记」使用
+        // 「切入点标记」
     }
 
     /**

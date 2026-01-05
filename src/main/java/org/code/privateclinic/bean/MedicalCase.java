@@ -20,8 +20,14 @@ public class MedicalCase {
     @NotNull(message = "患者ID不能为空")
     private Long patientId;
 
+    // 患者姓名（用于显示）
+    private String patientName;
+
     @NotNull(message = "医生ID不能为空")
     private Long doctorId;
+
+    // 医生姓名（用于显示）
+    private String doctorName;
 
     // 症状
     private String symptom;

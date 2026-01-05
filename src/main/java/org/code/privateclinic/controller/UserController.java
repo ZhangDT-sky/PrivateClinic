@@ -169,6 +169,10 @@ public class UserController {
         if (currentUser == null || (!"ADMIN".equalsIgnoreCase(currentUser.getRole()))) {
             return ResponseMessage.failed("只有管理员有权删除用户");
         }
+        // 管理员不能删除自己
+        if (currentUser.getUserId().equals(userId)) {
+            return ResponseMessage.failed("系统管理员不能删除自己");
+        }
         try {
             int result = userService.deleteUser(userId);
             if(result > 0){
@@ -195,6 +199,10 @@ public class UserController {
         // 只有管理员能物理删除用户
         if (currentUser == null || (!"ADMIN".equalsIgnoreCase(currentUser.getRole()))) {
             return ResponseMessage.failed("只有管理员有权物理删除用户");
+        }
+        // 管理员不能删除自己
+        if (currentUser.getUserId().equals(userId)) {
+            return ResponseMessage.failed("系统管理员不能删除自己");
         }
         try {
             int result = userService.deleteUserPhysical(userId);

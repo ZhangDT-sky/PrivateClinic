@@ -237,8 +237,8 @@
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>患者ID</th>
-                    <th>医生ID</th>
+                    <th>患者</th>
+                    <th>医生</th>
                     <th>症状</th>
                     <th>诊断</th>
                     <th>状态</th>
@@ -339,8 +339,8 @@
                 return `
                     <tr>
                         <td>${c.caseId}</td>
-                        <td>${c.patientId}</td>
-                        <td>${c.doctorId}</td>
+                        <td>${c.patientName || c.patientId || '-'}</td>
+                        <td>${c.doctorName || c.doctorId || '-'}</td>
                         <td>${c.symptom || '-'}</td>
                         <td>${c.diagnosis || '-'}</td>
                         <td><span class="status-badge status-${c.caseStatus}">${statusText[c.caseStatus] || c.caseStatus}</span></td>

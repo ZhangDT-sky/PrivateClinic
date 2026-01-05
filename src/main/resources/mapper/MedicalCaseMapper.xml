@@ -7,84 +7,104 @@
     <!-- 查询所有病例列表 -->
     <select id="getMedicalCaseList" resultType="org.code.privateclinic.bean.MedicalCase">
         SELECT
-            case_id AS caseId,
-            patient_id AS patientId,
-            doctor_id AS doctorId,
-            symptom,
-            diagnosis,
-            case_status AS caseStatus,
-            visit_time AS visitTime,
-            create_time AS createTime,
-            update_time AS updateTime
-        FROM medical_case
-        ORDER BY create_time DESC
+            mc.case_id AS caseId,
+            mc.patient_id AS patientId,
+            p.patient_name AS patientName,
+            mc.doctor_id AS doctorId,
+            u.user_name AS doctorName,
+            mc.symptom,
+            mc.diagnosis,
+            mc.case_status AS caseStatus,
+            mc.visit_time AS visitTime,
+            mc.create_time AS createTime,
+            mc.update_time AS updateTime
+        FROM medical_case mc
+        LEFT JOIN patient p ON mc.patient_id = p.patient_id
+        LEFT JOIN user u ON mc.doctor_id = u.user_id
+        ORDER BY mc.create_time DESC
     </select>
 
     <!-- 根据ID查询病例 -->
     <select id="getMedicalCaseById" resultType="org.code.privateclinic.bean.MedicalCase">
         SELECT
-            case_id AS caseId,
-            patient_id AS patientId,
-            doctor_id AS doctorId,
-            symptom,
-            diagnosis,
-            case_status AS caseStatus,
-            visit_time AS visitTime,
-            create_time AS createTime,
-            update_time AS updateTime
-        FROM medical_case
-        WHERE case_id = #{caseId}
+            mc.case_id AS caseId,
+            mc.patient_id AS patientId,
+            p.patient_name AS patientName,
+            mc.doctor_id AS doctorId,
+            u.user_name AS doctorName,
+            mc.symptom,
+            mc.diagnosis,
+            mc.case_status AS caseStatus,
+            mc.visit_time AS visitTime,
+            mc.create_time AS createTime,
+            mc.update_time AS updateTime
+        FROM medical_case mc
+        LEFT JOIN patient p ON mc.patient_id = p.patient_id
+        LEFT JOIN user u ON mc.doctor_id = u.user_id
+        WHERE mc.case_id = #{caseId}
     </select>
 
     <!-- 根据患者ID查询病例列表 -->
     <select id="getMedicalCaseByPatientId" resultType="org.code.privateclinic.bean.MedicalCase">
         SELECT
-            case_id AS caseId,
-            patient_id AS patientId,
-            doctor_id AS doctorId,
-            symptom,
-            diagnosis,
-            case_status AS caseStatus,
-            visit_time AS visitTime,
-            create_time AS createTime,
-            update_time AS updateTime
-        FROM medical_case
-        WHERE patient_id = #{patientId}
-        ORDER BY create_time DESC
+            mc.case_id AS caseId,
+            mc.patient_id AS patientId,
+            p.patient_name AS patientName,
+            mc.doctor_id AS doctorId,
+            u.user_name AS doctorName,
+            mc.symptom,
+            mc.diagnosis,
+            mc.case_status AS caseStatus,
+            mc.visit_time AS visitTime,
+            mc.create_time AS createTime,
+            mc.update_time AS updateTime
+        FROM medical_case mc
+        LEFT JOIN patient p ON mc.patient_id = p.patient_id
+        LEFT JOIN user u ON mc.doctor_id = u.user_id
+        WHERE mc.patient_id = #{patientId}
+        ORDER BY mc.create_time DESC
     </select>
 
     <!-- 根据医生ID查询病例列表 -->
     <select id="getMedicalCaseByDoctorId" resultType="org.code.privateclinic.bean.MedicalCase">
         SELECT
-            case_id AS caseId,
-            patient_id AS patientId,
-            doctor_id AS doctorId,
-            symptom,
-            diagnosis,
-            case_status AS caseStatus,
-            visit_time AS visitTime,
-            create_time AS createTime,
-            update_time AS updateTime
-        FROM medical_case
-        WHERE doctor_id = #{doctorId}
-        ORDER BY create_time DESC
+            mc.case_id AS caseId,
+            mc.patient_id AS patientId,
+            p.patient_name AS patientName,
+            mc.doctor_id AS doctorId,
+            u.user_name AS doctorName,
+            mc.symptom,
+            mc.diagnosis,
+            mc.case_status AS caseStatus,
+            mc.visit_time AS visitTime,
+            mc.create_time AS createTime,
+            mc.update_time AS updateTime
+        FROM medical_case mc
+        LEFT JOIN patient p ON mc.patient_id = p.patient_id
+        LEFT JOIN user u ON mc.doctor_id = u.user_id
+        WHERE mc.doctor_id = #{doctorId}
+        ORDER BY mc.create_time DESC
     </select>
 
     <!-- 根据状态查询病例列表 -->
     <select id="getMedicalCaseByStatus" resultType="org.code.privateclinic.bean.MedicalCase">
         SELECT
-            case_id AS caseId,
-            patient_id AS patientId,
-            doctor_id AS doctorId,
-            symptom,
-            diagnosis,
-            case_status AS caseStatus,
-            visit_time AS visitTime,
-            create_time AS createTime,
-            update_time AS updateTime
-        FROM medical_case
-        WHERE case_status = #{caseStatus}
-        ORDER BY create_time DESC
+            mc.case_id AS caseId,
+            mc.patient_id AS patientId,
+            p.patient_name AS patientName,
+            mc.doctor_id AS doctorId,
+            u.user_name AS doctorName,
+            mc.symptom,
+            mc.diagnosis,
+            mc.case_status AS caseStatus,
+            mc.visit_time AS visitTime,
+            mc.create_time AS createTime,
+            mc.update_time AS updateTime
+        FROM medical_case mc
+        LEFT JOIN patient p ON mc.patient_id = p.patient_id
+        LEFT JOIN user u ON mc.doctor_id = u.user_id
+        WHERE mc.case_status = #{caseStatus}
+        ORDER BY mc.create_time DESC
     </select>
 
     <!-- 插入病例 -->

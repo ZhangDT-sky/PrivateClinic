@@ -14,10 +14,10 @@ public class CorsConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         // 允许所有源
-        config.addAllowedOriginPattern("*");
-        config.addAllowedHeader("*");
-        config.addAllowedMethod("*");
-        config.setAllowCredentials(true);
+        config.addAllowedOriginPattern("*");//跨域源
+        config.addAllowedHeader("*");//请求头
+        config.addAllowedMethod("*");//HTTP方法
+        config.setAllowCredentials(true);//允许凭证
         
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);

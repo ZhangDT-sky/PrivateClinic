@@ -18,8 +18,14 @@ public class Prescription {
     @NotNull(message = "病例ID不能为空")
     private Long caseId;
 
+    // 患者姓名（用于显示）
+    private String patientName;
+
     @NotNull(message = "医生ID不能为空")
     private Long doctorId;
+
+    // 医生姓名（用于显示）
+    private String doctorName;
 
     //金额
     private BigDecimal totalAmount;

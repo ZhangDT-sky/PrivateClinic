@@ -7,51 +7,71 @@
     <!-- 查询所有处方列表 -->
     <select id="getPrescriptionList" resultType="org.code.privateclinic.bean.Prescription">
         SELECT
-            prescription_id AS prescriptionId,
-            case_id AS caseId,
-            doctor_id AS doctorId,
-            total_amount AS totalAmount,
-            create_time AS createTime
-        FROM prescription
-        ORDER BY create_time DESC
+            p.prescription_id AS prescriptionId,
+            p.case_id AS caseId,
+            pt.patient_name AS patientName,
+            p.doctor_id AS doctorId,
+            u.user_name AS doctorName,
+            p.total_amount AS totalAmount,
+            p.create_time AS createTime
+        FROM prescription p
+        LEFT JOIN medical_case mc ON p.case_id = mc.case_id
+        LEFT JOIN patient pt ON mc.patient_id = pt.patient_id
+        LEFT JOIN user u ON p.doctor_id = u.user_id
+        ORDER BY p.create_time DESC
     </select>
 
     <!-- 根据ID查询处方 -->
     <select id="getPrescriptionById" resultType="org.code.privateclinic.bean.Prescription">
         SELECT
-            prescription_id AS prescriptionId,
-            case_id AS caseId,
-            doctor_id AS doctorId,
-            total_amount AS totalAmount,
-            create_time AS createTime
-        FROM prescription
-        WHERE prescription_id = #{prescriptionId}
+            p.prescription_id AS prescriptionId,
+            p.case_id AS caseId,
+            pt.patient_name AS patientName,
+            p.doctor_id AS doctorId,
+            u.user_name AS doctorName,
+            p.total_amount AS totalAmount,
+            p.create_time AS createTime
+        FROM prescription p
+        LEFT JOIN medical_case mc ON p.case_id = mc.case_id
+        LEFT JOIN patient pt ON mc.patient_id = pt.patient_id
+        LEFT JOIN user u ON p.doctor_id = u.user_id
+        WHERE p.prescription_id = #{prescriptionId}
     </select>
 
     <!-- 根据病例ID查询处方列表 -->
     <select id="getPrescriptionByCaseId" resultType="org.code.privateclinic.bean.Prescription">
         SELECT
-            prescription_id AS prescriptionId,
-            case_id AS caseId,
-            doctor_id AS doctorId,
-            total_amount AS totalAmount,
-            create_time AS createTime
-        FROM prescription
-        WHERE case_id = #{caseId}
-        ORDER BY create_time DESC
+            p.prescription_id AS prescriptionId,
+            p.case_id AS caseId,
+            pt.patient_name AS patientName,
+            p.doctor_id AS doctorId,
+            u.user_name AS doctorName,
+            p.total_amount AS totalAmount,
+            p.create_time AS createTime
+        FROM prescription p
+        LEFT JOIN medical_case mc ON p.case_id = mc.case_id
+        LEFT JOIN patient pt ON mc.patient_id = pt.patient_id
+        LEFT JOIN user u ON p.doctor_id = u.user_id
+        WHERE p.case_id = #{caseId}
+        ORDER BY p.create_time DESC
     </select>
 
     <!-- 根据医生ID查询处方列表 -->
     <select id="getPrescriptionByDoctorId" resultType="org.code.privateclinic.bean.Prescription">
         SELECT
-            prescription_id AS prescriptionId,
-            case_id AS caseId,
-            doctor_id AS doctorId,
-            total_amount AS totalAmount,
-            create_time AS createTime
-        FROM prescription
-        WHERE doctor_id = #{doctorId}
-        ORDER BY create_time DESC
+            p.prescription_id AS prescriptionId,
+            p.case_id AS caseId,
+            pt.patient_name AS patientName,
+            p.doctor_id AS doctorId,
+            u.user_name AS doctorName,
+            p.total_amount AS totalAmount,
+            p.create_time AS createTime
+        FROM prescription p
+        LEFT JOIN medical_case mc ON p.case_id = mc.case_id
+        LEFT JOIN patient pt ON mc.patient_id = pt.patient_id
+        LEFT JOIN user u ON p.doctor_id = u.user_id
+        WHERE p.doctor_id = #{doctorId}
+        ORDER BY p.create_time DESC
     </select>
 
     <!-- 插入处方 -->

@@ -241,8 +241,8 @@
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>病例ID</th>
-                    <th>医生ID</th>
+                    <th>患者</th>
+                    <th>医生</th>
                     <th>总金额</th>
                     <th>创建时间</th>
                     <th>操作</th>
@@ -324,8 +324,8 @@
                 return `
                     <tr>
                         <td>${p.prescriptionId}</td>
-                        <td>${p.caseId}</td>
-                        <td>${p.doctorId}</td>
+                        <td>${p.patientName || p.caseId || '-'}</td>
+                        <td>${p.doctorName || p.doctorId || '-'}</td>
                         <td>${p.totalAmount ? '¥' + parseFloat(p.totalAmount).toFixed(2) : '-'}</td>
                         <td>${createTime}</td>
                         <td>
@@ -382,11 +382,21 @@
                 
                 if (result.code === 200) {
                     const itemsList = result.data || [];
-                    let msg = '处方明细：\n';
-                    itemsList.forEach(item => {
-                        msg += `药品ID: ${item.drugId}, 数量: ${item.quantity}, 用法: ${item.usageMethod || '-'}, 单价: ${item.price || '-'}\n`;
-                    });
-                    alert(msg || '暂无明细');
+                    let msg = '处方明细：\n\n';
+                    if (itemsList.length === 0) {
+                        msg += '暂无明细';
+                    } else {
+                        itemsList.forEach((item, index) => {
+                            const drugName = item.drugName || `药品ID: ${item.drugId}`;
+                            const drugStatus = item.drugStatus === 0 ? ' [已停用]' : '';
+                            msg += `${index + 1}. ${drugName}${drugStatus}\n`;
+                            msg += `   规格: ${item.specification || '-'}\n`;
+                            msg += `   数量: ${item.quantity}\n`;
+                            msg += `   用法: ${item.usageMethod || '-'}\n`;
+                            msg += `   单价: ${item.price ? '¥' + parseFloat(item.price).toFixed(2) : '-'}\n\n`;
+                        });
+                    }
+                    alert(msg);
                 } else {
                     showMessage(result.message || '加载失败', 'error');
                 }
