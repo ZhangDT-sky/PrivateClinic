@@ -1,20 +1,34 @@
 -- ============================================
 -- 私人诊所管理系统 - 演示数据SQL脚本
 -- ============================================
+-- 注意：此脚本需要先执行 data.sql 创建数据库结构
+-- 此脚本符合新的数据库约束（唯一约束和级联删除）
 
--- 清空现有数据（可选，谨慎使用）
--- SET FOREIGN_KEY_CHECKS = 0;
--- TRUNCATE TABLE prescription_item;
--- TRUNCATE TABLE prescription;
--- TRUNCATE TABLE medical_case;
--- TRUNCATE TABLE patient;
--- TRUNCATE TABLE drug;
--- TRUNCATE TABLE user;
--- SET FOREIGN_KEY_CHECKS = 1;
+-- ============================================
+-- 清空现有数据并重置 AUTO_INCREMENT
+-- ============================================
+-- 注意：如果数据库中已有数据，执行此部分会清空所有数据
+SET FOREIGN_KEY_CHECKS = 0;
+TRUNCATE TABLE prescription_item;
+TRUNCATE TABLE prescription;
+TRUNCATE TABLE medical_case;
+TRUNCATE TABLE patient;
+TRUNCATE TABLE drug;
+TRUNCATE TABLE user;
+SET FOREIGN_KEY_CHECKS = 1;
+
+-- 重置 AUTO_INCREMENT（确保ID从1开始）
+ALTER TABLE user AUTO_INCREMENT = 1;
+ALTER TABLE drug AUTO_INCREMENT = 1;
+ALTER TABLE patient AUTO_INCREMENT = 1;
+ALTER TABLE medical_case AUTO_INCREMENT = 1;
+ALTER TABLE prescription AUTO_INCREMENT = 1;
+ALTER TABLE prescription_item AUTO_INCREMENT = 1;
 
 -- ============================================
 -- 1. 用户表数据 (user)
 -- ============================================
+-- 注意：user_name 和 phone 必须唯一
 INSERT INTO user (password, user_name, role, phone, status, create_time, update_time) VALUES
 ('admin123', '系统管理员', 'ADMIN', '13800000001', 1, NOW(), NOW()),
 ('doctor123', '张医生', 'DOCTOR', '13800000002', 1, NOW(), NOW()),
@@ -24,6 +38,7 @@ INSERT INTO user (password, user_name, role, phone, status, create_time, update_
 -- ============================================
 -- 2. 药品表数据 (drug)
 -- ============================================
+-- 注意：drug_name + specification 组合必须唯一
 INSERT INTO drug (drug_name, specification, price, stock, status, create_time, update_time) VALUES
 ('阿莫西林胶囊', '0.25g*24粒/盒', 15.50, 100, 1, NOW(), NOW()),
 ('头孢克肟片', '0.1g*12片/盒', 28.00, 80, 1, NOW(), NOW()),
@@ -44,6 +59,7 @@ INSERT INTO drug (drug_name, specification, price, stock, status, create_time, u
 -- ============================================
 -- 3. 患者表数据 (patient)
 -- ============================================
+-- 注意：phone 必须唯一（如果提供的话）
 INSERT INTO patient (patient_name, gender, age, phone, address, remark, doctor_id, create_time, update_time) VALUES
 ('张三', '男', 35, '13900000001', '北京市朝阳区XX街道XX号', '高血压病史', 2, NOW(), NOW()),
 ('李四', '女', 28, '13900000002', '北京市海淀区XX路XX号', '无特殊病史', 2, NOW(), NOW()),
@@ -99,7 +115,7 @@ INSERT INTO prescription_item (prescription_id, drug_id, quantity, usage_method,
 (2, 8, 1, '口服，一次1袋，一日3次，用温开水冲服', 16.00),
 (2, 13, 1, '口服，一次1片，一日3次，饭后服用', 5.00);
 
--- 处方3：支气管炎
+-- 处方3：支气管炎（注意：case_id=4对应处方id=3）
 INSERT INTO prescription_item (prescription_id, drug_id, quantity, usage_method, price) VALUES
 (3, 2, 2, '口服，一次1片，一日2次，饭后服用', 28.00),
 (3, 4, 1, '含服，一次2片，一日3次', 8.00),
@@ -128,16 +144,24 @@ INSERT INTO prescription_item (prescription_id, drug_id, quantity, usage_method,
 -- 数据说明
 -- ============================================
 -- 1. 用户数据：1个管理员，3个医生
+--    - user_name 和 phone 必须唯一
 -- 2. 药品数据：15种常见药品
+--    - drug_name + specification 组合必须唯一
 -- 3. 患者数据：10个患者，分配给不同的医生
+--    - phone 必须唯一
 -- 4. 病例数据：12个病例，包含不同状态（NEW、TREATING、PRESCRIBED、FINISHED）
 -- 5. 处方数据：7个处方，对应已完成的病例
 -- 6. 处方明细：包含多个药品的处方明细
+-- 
+-- 外键级联删除说明：
+-- - 删除患者时，自动删除该患者的所有病历
+-- - 删除病历时，自动删除该病历的所有处方
+-- - 删除处方时，自动删除该处方的所有处方明细
+-- - 删除药品时，不会自动删除处方明细（保留历史记录）
+-- - 删除用户时，不会自动删除相关记录（需要业务逻辑处理）
 -- 
 -- 登录账号（使用user_name作为登录用户名）：
 -- - 管理员：系统管理员 / admin123
 -- - 医生1：张医生 / doctor123
 -- - 医生2：李医生 / doctor123
 -- - 医生3：王医生 / doctor123
-
-
