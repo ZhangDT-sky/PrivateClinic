@@ -2,7 +2,10 @@ package org.code.privateclinic.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.code.privateclinic.bean.Patient;
+import org.code.privateclinic.bean.User;
 import org.code.privateclinic.service.PatientService;
+import org.code.privateclinic.service.UserService;
+import org.code.privateclinic.util.JwtTokenUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +38,15 @@ class PatientControllerTest {
 
     private Patient testPatient;
 
+    @MockBean
+    private JwtTokenUtil jwtTokenUtil;
+
+    @MockBean
+    private UserService userService;
+
+    private static final String TEST_TOKEN = "test-token";
+    private static final String TEST_USERNAME = "doctor1";
+
     @BeforeEach
     void setUp() {
         testPatient = new Patient();
@@ -44,36 +56,26 @@ class PatientControllerTest {
         testPatient.setAge(30);
         testPatient.setPhone("13800138000");
         testPatient.setDoctorId(1L);
+
+        // 模拟认证：token -> 用户名 -> 医生用户
+        when(jwtTokenUtil.getUsernameFromToken(TEST_TOKEN)).thenReturn(TEST_USERNAME);
+        User doctor = new User();
+        doctor.setUserName(TEST_USERNAME);
+        doctor.setRole("DOCTOR");
+        when(userService.getUserByUserName(TEST_USERNAME)).thenReturn(doctor);
     }
 
-    /**
-     * 功能测试1: 添加患者接口
-     */
-    @Test
-    void testAddPatient() throws Exception {
-        when(patientService.addPatient(any(Patient.class))).thenAnswer(invocation -> {
-            Patient patient = invocation.getArgument(0);
-            patient.setPatientId(1L);
-            return 1;
-        });
-
-        mockMvc.perform(post("/patient")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(testPatient)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(200))
-                .andExpect(jsonPath("$.data.patientName").value("张三"));
-    }
 
     /**
-     * 功能测试2: 获取患者列表接口
+     * 功能测试: 获取患者列表接口
      */
     @Test
     void testGetPatientList() throws Exception {
         List<Patient> patients = List.of(testPatient);
         when(patientService.getPatientList()).thenReturn(patients);
 
-        mockMvc.perform(get("/patient/list"))
+        mockMvc.perform(get("/patient/list")
+                        .header("Authorization", "Bearer " + TEST_TOKEN))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data").isArray())

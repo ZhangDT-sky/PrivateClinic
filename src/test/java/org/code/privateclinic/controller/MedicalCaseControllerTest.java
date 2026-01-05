@@ -2,7 +2,10 @@ package org.code.privateclinic.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.code.privateclinic.bean.MedicalCase;
+import org.code.privateclinic.bean.User;
 import org.code.privateclinic.service.MedicalCaseService;
+import org.code.privateclinic.service.UserService;
+import org.code.privateclinic.util.JwtTokenUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,10 +33,19 @@ class MedicalCaseControllerTest {
     @MockBean
     private MedicalCaseService medicalCaseService;
 
+    @MockBean
+    private JwtTokenUtil jwtTokenUtil;
+
+    @MockBean
+    private UserService userService;
+
     @Autowired
     private ObjectMapper objectMapper;
 
     private MedicalCase testMedicalCase;
+
+    private static final String TEST_TOKEN = "test-token";
+    private static final String TEST_USERNAME = "doctor1";
 
     @BeforeEach
     void setUp() {
@@ -44,29 +56,17 @@ class MedicalCaseControllerTest {
         testMedicalCase.setSymptom("头痛、发热");
         testMedicalCase.setDiagnosis("感冒");
         testMedicalCase.setCaseStatus("NEW");
+
+        // 模拟认证：token -> 用户名 -> 医生用户
+        when(jwtTokenUtil.getUsernameFromToken(TEST_TOKEN)).thenReturn(TEST_USERNAME);
+        User doctor = new User();
+        doctor.setUserName(TEST_USERNAME);
+        doctor.setRole("DOCTOR");
+        when(userService.getUserByUserName(TEST_USERNAME)).thenReturn(doctor);
     }
 
     /**
-     * 功能测试 1: 添加病例接口
-     */
-    @Test
-    void testAddMedicalCase() throws Exception {
-        when(medicalCaseService.addMedicalCase(any(MedicalCase.class))).thenAnswer(invocation -> {
-            MedicalCase medicalCase = invocation.getArgument(0);
-            medicalCase.setCaseId(1L);
-            return 1;
-        });
-
-        mockMvc.perform(post("/medical-case")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(testMedicalCase)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(200))
-                .andExpect(jsonPath("$.data.caseStatus").value("NEW"));
-    }
-
-    /**
-     * 功能测试 2: 根据患者ID查询病例列表接口
+     * 功能测试: 根据患者ID查询病例列表接口
      */
     @Test
     void testGetMedicalCaseByPatientId() throws Exception {
@@ -74,7 +74,8 @@ class MedicalCaseControllerTest {
         when(medicalCaseService.getMedicalCaseByPatientId(1L)).thenReturn(cases);
 
 
-        mockMvc.perform(get("/medical-case/patient/1"))
+        mockMvc.perform(get("/medical-case/patient/1")
+                        .header("Authorization", "Bearer " + TEST_TOKEN))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data").isArray())

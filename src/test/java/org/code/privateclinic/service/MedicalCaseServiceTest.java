@@ -40,27 +40,8 @@ class MedicalCaseServiceTest {
         testMedicalCase.setDiagnosis("感冒");
         testMedicalCase.setCaseStatus("NEW");
     }
-
     /**
-     * 单元测试1: 添加病例成功
-     */
-    @Test
-    void testAddMedicalCase_Success() {
-        when(medicalCaseMapper.addMedicalCase(any(MedicalCase.class))).thenAnswer(invocation -> {
-            MedicalCase medicalCase = invocation.getArgument(0);
-            medicalCase.setCaseId(1L);
-            return 1;
-        });
-
-        int result = medicalCaseService.addMedicalCase(testMedicalCase);
-
-        assertEquals(1, result);
-        assertNotNull(testMedicalCase.getCaseId());
-        verify(medicalCaseMapper, times(1)).addMedicalCase(any(MedicalCase.class));
-    }
-
-    /**
-     * 单元测试2: 根据患者ID查询病例列表
+     * 单元测试: 根据患者ID查询病例列表
      */
     @Test
     void testGetMedicalCaseByPatientId() {

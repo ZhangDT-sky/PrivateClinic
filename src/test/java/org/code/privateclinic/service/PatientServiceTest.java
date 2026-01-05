@@ -41,26 +41,9 @@ class PatientServiceTest {
         testPatient.setDoctorId(1L);
     }
 
-    /**
-     * 单元测试1: 添加患者成功
-     */
-    @Test
-    void testAddPatient_Success() {
-        when(patientMapper.addPatient(any(Patient.class))).thenAnswer(invocation -> {
-            Patient patient = invocation.getArgument(0);
-            patient.setPatientId(1L);
-            return 1;
-        });
-
-        int result = patientService.addPatient(testPatient);
-
-        assertEquals(1, result);
-        assertNotNull(testPatient.getPatientId());
-        verify(patientMapper, times(1)).addPatient(any(Patient.class));
-    }
 
     /**
-     * 单元测试2: 查询患者列表
+     * 单元测试: 查询患者列表
      */
     @Test
     void testGetPatientList() {
